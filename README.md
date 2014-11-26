@@ -57,7 +57,7 @@ type specific functionality. To make this easy, the asset value will
 be passed to a function caller *wrapper*. **You** need to write these
 wrapper functions.
 
-The name of the default wrapper is (final) extension of the asset
+The name of the default wrapper is the (final) extension of the asset
 filename. For `index.html`, that's `html`. You can override the
 wrapper with `-wrap=NAME`.
 
