@@ -102,7 +102,7 @@ func autogen(w io.Writer) error {
 	return err
 }
 
-func process(filename, pkg, variable, wrap string) (err error) {
+func process(filename, pkg, variable, wrap string) error {
 	src, err := os.Open(filename)
 	if err != nil {
 		return err
