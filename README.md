@@ -29,7 +29,7 @@ line.
 
 ## Variable name
 
-The generated files declare a variable that now contains your asset.
+The generated files declare variables that now contain your assets.
 Given the above `index.html`, the variable will be named `index`.
 
 You can override the name with `-var=NAME`, or skip it with `-var=_`
