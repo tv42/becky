@@ -103,8 +103,8 @@ image assets can get big, this can start to slow down your builds. The
 mechanism used for embedding has been chosen to be the most efficient
 available.
 
-Embedding a 10MB asset (creating a 28MB Go source file) <1 second to
-generate the code and about 1 second for every compilation.
+Embedding a 10MB asset (creating a 28MB Go source file) takes <1
+second to generate the code and about 1 second for every compilation.
 
 You can minimize the number of times assets need to be compiled by
 putting them in a different package that updates less often than most
