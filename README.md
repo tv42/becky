@@ -54,10 +54,12 @@ selection.
 
 For most uses, an `asset` value needs to be given application or file
 type specific functionality. To make this easy, the asset value will
-be passed to a function caller *wrapper*, default wrapper being the
-(final) extension of the filename. For `index.html`, that's `html`.
+be passed to a function caller *wrapper*. **You** need to write these
+wrapper functions.
 
-You can override the wrapper with `-wrap=NAME`.
+The name of the default wrapper is (final) extension of the asset
+filename. For `index.html`, that's `html`. You can override the
+wrapper with `-wrap=NAME`.
 
 In your application, you'd do something like
 
