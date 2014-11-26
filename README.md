@@ -3,7 +3,7 @@
 Becky embeds assets as string literals in Go source.
 
 
-## `go generate`
+## Usage
 
 Just copy
 [`asset.go`](https://raw.githubusercontent.com/tv42/becky/master/asset.go)
