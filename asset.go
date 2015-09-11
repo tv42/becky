@@ -21,22 +21,14 @@ import (
 	"time"
 )
 
-var asset_dev = asset(asset.init(asset{Name: "asset_dev.go", Content: "" +
+var asset_dev = asset(asset{Name: "asset_dev.go", Content: "" +
 	"// +build dev\n\npackage main\n\nimport (\n\t\"go/build\"\n\t\"net/http\"\n\t\"os\"\n\t\"path/filepath\"\n\t\"time\"\n)\n\ntype asset struct {\n\tName    string\n\tContent string\n\t// don't bother precomputing ETag if we're reloading from disk\n}\n\nfunc (a asset) init() asset {\n\treturn a\n}\n\nfunc (a asset) importPath() string {\n\t// filled at code gen time\n\treturn \"{{.ImportPath}}\"\n}\n\nfunc (a asset) Open() (*os.File, error) {\n\tpath := a.importPath()\n\tpkg, err := build.Import(path, \".\", build.FindOnly)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\tp := filepath.Join(pkg.Dir, a.Name)\n\treturn os.Open(p)\n}\n\nfunc (a asset) ServeHTTP(w http.ResponseWriter, req *http.Request) {\n\tbody, err := a.Open()\n\tif err != nil {\n\t\t// show the os.Open message, with paths and all, but this only\n\t\t// happens in dev mode.\n\t\thttp.Error(w, err.Error(), http.StatusInternalServerError)\n\t\treturn\n\t}\n\tdefer body.Close()\n\thttp.ServeContent(w, req, a.Name, time.Time{}, body)\n}\n" +
-	""}))
+	"", etag: `"c1Es6vaoVm4="`})
 
 type asset struct {
 	Name    string
 	Content string
 	etag    string
-}
-
-func (a asset) init() asset {
-
-	h := fnv.New64a()
-	_, _ = io.WriteString(h, a.Content)
-	a.etag = `"` + base64.StdEncoding.EncodeToString(h.Sum(nil)) + `"`
-	return a
 }
 
 func (a asset) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -47,9 +39,9 @@ func (a asset) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	http.ServeContent(w, req, a.Name, time.Time{}, body)
 }
 
-var asset_nodev = asset(asset.init(asset{Name: "asset_nodev.go", Content: "" +
-	"// +build !dev\n\npackage main\n\nimport (\n\t\"encoding/base64\"\n\t\"hash/fnv\"\n\t\"io\"\n\t\"net/http\"\n\t\"strings\"\n\t\"time\"\n)\n\ntype asset struct {\n\tName    string\n\tContent string\n\tetag    string\n}\n\nfunc (a asset) init() asset {\n\t// This is a method to minize the namespace pollution. Use\n\t// chaining to make it callable in variable declarations.\n\th := fnv.New64a()\n\t_, _ = io.WriteString(h, a.Content)\n\ta.etag = `\"` + base64.StdEncoding.EncodeToString(h.Sum(nil)) + `\"`\n\treturn a\n}\n\nfunc (a asset) ServeHTTP(w http.ResponseWriter, req *http.Request) {\n\tif a.etag != \"\" && w.Header().Get(\"ETag\") == \"\" {\n\t\tw.Header().Set(\"ETag\", a.etag)\n\t}\n\tbody := strings.NewReader(a.Content)\n\thttp.ServeContent(w, req, a.Name, time.Time{}, body)\n}\n" +
-	""}))
+var asset_nodev = asset(asset{Name: "asset_nodev.go", Content: "" +
+	"// +build !dev\n\npackage main\n\nimport (\n\t\"net/http\"\n\t\"strings\"\n\t\"time\"\n)\n\ntype asset struct {\n\tName    string\n\tContent string\n\tetag    string\n}\n\nfunc (a asset) ServeHTTP(w http.ResponseWriter, req *http.Request) {\n\tif a.etag != \"\" && w.Header().Get(\"ETag\") == \"\" {\n\t\tw.Header().Set(\"ETag\", a.etag)\n\t}\n\tbody := strings.NewReader(a.Content)\n\thttp.ServeContent(w, req, a.Name, time.Time{}, body)\n}\n" +
+	"", etag: `"pGCgphv16Ds="`})
 
 var (
 	flagVar  = flag.String("var", "", "variable name to use, \"_\" to ignore (default: file basename without extension)")
@@ -172,7 +164,9 @@ func process(filename, pkg, variable, wrap string) error {
 }
 
 func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
-	_, err := fmt.Fprintf(out, "var %s = %s(asset.init(asset{Name: %q, Content: \"\" +\n",
+	h := fnv.New64a()
+	r := io.TeeReader(in, h)
+	_, err := fmt.Fprintf(out, "var %s = %s(asset{Name: %q, Content: \"\" +\n",
 		variable, wrap, filename)
 	if err != nil {
 		return err
@@ -180,7 +174,7 @@ func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
 	buf := make([]byte, 1*1024*1024)
 	eof := false
 	for !eof {
-		n, err := in.Read(buf)
+		n, err := r.Read(buf)
 		switch err {
 		case io.EOF:
 			eof = true
@@ -199,7 +193,8 @@ func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
 			return err
 		}
 	}
-	if _, err := fmt.Fprintf(out, "\t\"\"}))\n"); err != nil {
+	etag := `"` + base64.StdEncoding.EncodeToString(h.Sum(nil)) + `"`
+	if _, err := fmt.Fprintf(out, "\t\"\", etag: %#q})\n", etag); err != nil {
 		return err
 	}
 	return nil

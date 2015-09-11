@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"go/build"
+	"hash/fnv"
 	"io"
 	"io/ioutil"
 	"log"
@@ -147,7 +149,9 @@ func process(filename, pkg, variable, wrap string) error {
 }
 
 func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
-	_, err := fmt.Fprintf(out, "var %s = %s(asset.init(asset{Name: %q, Content: \"\" +\n",
+	h := fnv.New64a()
+	r := io.TeeReader(in, h)
+	_, err := fmt.Fprintf(out, "var %s = %s(asset{Name: %q, Content: \"\" +\n",
 		variable, wrap, filename)
 	if err != nil {
 		return err
@@ -155,7 +159,7 @@ func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
 	buf := make([]byte, 1*1024*1024)
 	eof := false
 	for !eof {
-		n, err := in.Read(buf)
+		n, err := r.Read(buf)
 		switch err {
 		case io.EOF:
 			eof = true
@@ -174,7 +178,8 @@ func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
 			return err
 		}
 	}
-	if _, err := fmt.Fprintf(out, "\t\"\"}))\n"); err != nil {
+	etag := `"` + base64.StdEncoding.EncodeToString(h.Sum(nil)) + `"`
+	if _, err := fmt.Fprintf(out, "\t\"\", etag: %#q})\n", etag); err != nil {
 		return err
 	}
 	return nil
