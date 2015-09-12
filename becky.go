@@ -22,7 +22,8 @@ import (
 // might not update everything. That's rare enough that we don't care.
 //
 //go:generate -command asset go run asset.go
-//go:generate asset -lib=false -wrap=asset -- asset_dev.go  asset_nodev.go
+//go:generate asset -lib=false -var=assetDev -wrap=asset -- asset_dev.go
+//go:generate asset -lib=false -var=assetNoDev -wrap=asset -- asset_nodev.go
 //go:generate go run ./internal/bundle.go
 
 var (
@@ -221,8 +222,8 @@ func loadPkg(dir string) (*build.Package, error) {
 
 func auxiliary(dir, imp, pkg string) error {
 	for filename, tmpl := range map[string]string{
-		"asset_dev":   asset_dev.Content,
-		"asset_nodev": asset_nodev.Content,
+		"asset_dev":   assetDev.Content,
+		"asset_nodev": assetNoDev.Content,
 	} {
 		tmpl = strings.Replace(tmpl, "\npackage main\n", "\npackage "+pkg+"\n", 1)
 
