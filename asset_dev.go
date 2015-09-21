@@ -13,7 +13,7 @@ import (
 type asset struct {
 	Name    string
 	Content string
-	// don't bother precomputing ETag if we're reloading from disk
+	etag    string
 }
 
 func (a asset) init() asset {
