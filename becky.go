@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"unicode"
 )
 
 // As asset.go generates the source code assets, and bundle.go
@@ -81,6 +82,9 @@ func main() {
 			if variable == "" {
 				log.Fatalf("cannot use empty file basename as identifier: %s", filename)
 			}
+		}
+		if !isIdentifier(variable) {
+			log.Fatalf("not a valid go identifier: %s", variable)
 		}
 
 		wrap := *flagWrap
@@ -268,4 +272,29 @@ func auxiliary(dir, imp, pkg string) error {
 		tmp = nil
 	}
 	return nil
+}
+
+// isIdentifier reports whether the things is a valid Go identifier.
+func isIdentifier(s string) bool {
+	// https://golang.org/ref/spec#Identifiers
+	// identifier = letter { letter | unicode_digit } .
+	// letter        = unicode_letter | "_" .
+	// unicode_letter = /* a Unicode code point classified as "Letter" */ .
+	// unicode_digit  = /* a Unicode code point classified as "Number, decimal digit" */ .
+
+	if len(s) == 0 {
+		return false
+	}
+	for i, r := range s {
+		if i == 0 {
+			if !unicode.IsLetter(r) && r != '_' {
+				return false
+			}
+		} else {
+			if !unicode.IsLetter(r) && r != '_' && !unicode.IsDigit(r) {
+				return false
+			}
+		}
+	}
+	return true
 }
