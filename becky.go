@@ -78,6 +78,9 @@ func main() {
 		variable := *flagVar
 		if variable == "" {
 			variable = strings.SplitN(base, ".", 2)[0]
+			if variable == "" {
+				log.Fatalf("cannot use empty file basename as identifier: %s", filename)
+			}
 		}
 
 		wrap := *flagWrap
