@@ -1,4 +1,3 @@
-  $ SRC="$(go list -f '{{.Dir}}' github.com/tv42/becky)"
   $ export GOPATH="$PWD"
   $ mkdir -p src/example.com/myproject
   $ cd src/example.com/myproject
