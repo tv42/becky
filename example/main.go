@@ -6,11 +6,7 @@ import (
 	"net/http"
 )
 
-// In most projects, you'd copy asset.go into the current directory,
-// and the below would say "go run asset.go".
-//
-//go:generate -command asset go run ../asset.go
-//go:generate asset index.html
+//go:generate go run github.com/tv42/becky index.html
 
 type HTML struct {
 	asset
