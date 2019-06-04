@@ -8,8 +8,7 @@ import (
 	"os"
 )
 
-//go:generate -command asset go run asset.go
-//go:generate asset greeting.txt
+//go:generate go run github.com/tv42/becky greeting.txt
 
 func txt(a asset) asset {
 	return a
