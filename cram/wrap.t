@@ -1,6 +1,5 @@
-  $ export GOPATH="$PWD"
-  $ mkdir -p src/example.com/myproject
-  $ cd src/example.com/myproject
+  $ go mod init example.com/myproject
+  go: creating new go.mod: module example.com/myproject
   $ echo package main >main.go
   $ echo Hello, world >greeting.txt
   $ becky -wrap=xyzzy greeting.txt

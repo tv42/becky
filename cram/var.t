@@ -1,6 +1,5 @@
-  $ export GOPATH="$PWD"
-  $ mkdir -p src/example.com/myproject
-  $ cd src/example.com/myproject
+  $ go mod init example.com/myproject
+  go: creating new go.mod: module example.com/myproject
   $ cp -- "$TESTDIR/cat-xyzzy.go" .
   $ echo Hello, world >greeting.txt
   $ becky -var=xyzzy greeting.txt

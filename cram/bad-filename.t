@@ -1,9 +1,8 @@
 Files with basenames that are not Go identifiers are errors, unless
 the `-var` flag is used.
 
-  $ export GOPATH="$PWD"
-  $ mkdir -p src/example.com/myproject
-  $ cd src/example.com/myproject
+  $ go mod init example.com/myproject
+  go: creating new go.mod: module example.com/myproject
   $ cp -- "$TESTDIR/cat-xyzzy.go" .
   $ echo Hello, world >not-a-go-identifier.txt
   $ becky not-a-go-identifier.txt

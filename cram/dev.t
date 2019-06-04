@@ -1,6 +1,5 @@
-  $ export GOPATH="$PWD"
-  $ mkdir -p src/example.com/myproject
-  $ cd src/example.com/myproject
+  $ go mod init example.com/myproject
+  go: creating new go.mod: module example.com/myproject
   $ cp -- "$TESTDIR/fakehttp.go" .
   $ cp -- "$TESTDIR/../asset.go" .
   $ echo Hello, world >greeting.txt
@@ -10,5 +9,5 @@
   Hello, world
   $ rm greeting.txt
   $ ./fakehttp
-  fakehttp.go: bad response: 500: open (.*)/src/example.com/myproject/greeting.txt: no such file or directory (re)
+  fakehttp.go: bad response: 500: open greeting.txt: no such file or directory
   [1]

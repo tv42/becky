@@ -1,6 +1,5 @@
-  $ export GOPATH="$PWD"
-  $ mkdir -p src/example.com/myproject
-  $ cd src/example.com/myproject
+  $ go mod init example.com/myproject
+  go: creating new go.mod: module example.com/myproject
 
 Using `-lib=false` disables creating `asset_*.gen.go` files:
 
@@ -8,6 +7,7 @@ Using `-lib=false` disables creating `asset_*.gen.go` files:
   $ echo Hello, world >greeting.txt
   $ becky -lib=false greeting.txt
   $ find -type f -printf '%P\n' | sort
+  go.mod
   greeting.txt
   greeting.txt.gen.go
   main.go
@@ -18,6 +18,7 @@ Leaving it out gets them created:
   $ find -type f -printf '%P\n' | sort
   asset_dev.gen.go
   asset_nodev.gen.go
+  go.mod
   greeting.txt
   greeting.txt.gen.go
   main.go
