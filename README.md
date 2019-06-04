@@ -138,5 +138,5 @@ of your source.
 ## Development mode
 
 If you build your application with `-tags dev`, `asset.ServeHTTP` will
-reload the asset from disk on every request, and not use the bundled
+reload the asset from disk on every request, and not use the embedded
 copy. This makes editing HTML, CSS and such more convenient.
