@@ -161,9 +161,9 @@ func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
 	buf := make([]byte, 1*1024*1024)
 	eof := false
 	for !eof {
-		n, err := r.Read(buf)
+		n, err := io.ReadFull(r, buf)
 		switch err {
-		case io.EOF:
+		case io.EOF, io.ErrUnexpectedEOF:
 			eof = true
 		case nil:
 			// nothing
