@@ -18,14 +18,8 @@ import (
 	"unicode"
 )
 
-// As asset.go generates the source code assets, and bundle.go
-// generates asset.go, there's actually a cycle here, where first run
-// might not update everything. That's rare enough that we don't care.
-//
-//go:generate -command asset go run asset.go
-//go:generate asset -lib=false -var=assetDev -wrap=asset -- asset_dev.go
-//go:generate asset -lib=false -var=assetNoDev -wrap=asset -- asset_nodev.go
-//go:generate go run ./internal/bundle.go
+//go:generate go run . -lib=false -var=assetDev -wrap=asset -- asset_dev.go
+//go:generate go run . -lib=false -var=assetNoDev -wrap=asset -- asset_nodev.go
 
 var (
 	flagVar  = flag.String("var", "", "variable name to use, \"_\" to ignore (default: file basename without extension)")
