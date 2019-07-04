@@ -27,7 +27,7 @@ var (
 	flagLib  = flag.Bool("lib", true, "generate asset_*.gen.go files defining the asset type")
 )
 
-var prog = filepath.Base(os.Args[0])
+const prog = "becky"
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage:\n")
