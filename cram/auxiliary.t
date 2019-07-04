@@ -1,11 +1,12 @@
   $ go mod init example.com/myproject
   go: creating new go.mod: module example.com/myproject
+  $ go mod edit -replace=github.com/tv42/becky="$TESTDIR/.."
 
 Using `-lib=false` disables creating `asset_*.gen.go` files:
 
   $ echo package main >main.go
   $ echo Hello, world >greeting.txt
-  $ becky -lib=false greeting.txt
+  $ go run github.com/tv42/becky -lib=false greeting.txt
   $ find -type f -printf '%P\n' | sort
   go.mod
   greeting.txt
@@ -14,7 +15,7 @@ Using `-lib=false` disables creating `asset_*.gen.go` files:
 
 Leaving it out gets them created:
 
-  $ becky greeting.txt
+  $ go run github.com/tv42/becky greeting.txt
   $ find -type f -printf '%P\n' | sort
   asset_dev.gen.go
   asset_nodev.gen.go
