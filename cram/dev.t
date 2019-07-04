@@ -10,5 +10,5 @@
   Hello, world
   $ rm greeting.txt
   $ ./fakehttp
-  fakehttp.go: bad response: 500: open greeting.txt: no such file or directory
+  fakehttp.go: bad response: 500: open .*/greeting.txt: no such file or directory (re)
   [1]

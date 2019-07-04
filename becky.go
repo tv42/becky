@@ -3,9 +3,9 @@ package main
 import (
 	"bufio"
 	"encoding/base64"
+	"errors"
 	"flag"
 	"fmt"
-	"go/build"
 	"hash/fnv"
 	"io"
 	"io/ioutil"
@@ -16,6 +16,8 @@ import (
 	"strings"
 	"text/template"
 	"unicode"
+
+	"golang.org/x/tools/go/packages"
 )
 
 //go:generate go run . -lib=false -var=assetDev -wrap=asset -- asset_dev.go
@@ -57,7 +59,7 @@ func main() {
 	// Look up package names and import paths only once. Every dir
 	// here is also guaranteed to have the auxiliary files already, to
 	// avoid repeating work.
-	packages := map[string]*build.Package{}
+	packages := map[string]*packages.Package{}
 
 	for _, filename := range flag.Args() {
 		dir, base := filepath.Split(filename)
@@ -187,7 +189,7 @@ func embed(variable, wrap, filename string, in io.Reader, out io.Writer) error {
 	return nil
 }
 
-func getPkg(packages map[string]*build.Package, dir string) (*build.Package, error) {
+func getPkg(packages map[string]*packages.Package, dir string) (*packages.Package, error) {
 	if pkg, found := packages[dir]; found {
 		return pkg, nil
 	}
@@ -197,7 +199,7 @@ func getPkg(packages map[string]*build.Package, dir string) (*build.Package, err
 		return nil, err
 	}
 	if *flagLib {
-		if err := auxiliary(pkg.Dir, pkg.ImportPath, pkg.Name); err != nil {
+		if err := auxiliary(dir, pkg.PkgPath, pkg.Name); err != nil {
 			return nil, err
 		}
 	}
@@ -205,20 +207,29 @@ func getPkg(packages map[string]*build.Package, dir string) (*build.Package, err
 	return pkg, nil
 }
 
-func loadPkg(dir string) (*build.Package, error) {
-	// if we don't resolve to absolute paths, the resulting import
-	// path ends up as just "."
-	if !filepath.IsAbs(dir) {
-		if abs, err := filepath.Abs(dir); err == nil {
-			dir = abs
-		}
+func loadPkg(dir string) (*packages.Package, error) {
+	cfg := &packages.Config{
+		Mode: packages.NeedName,
 	}
-
-	pkg, err := build.ImportDir(dir, 0)
+	pkgs, err := packages.Load(cfg, "pattern="+dir)
 	if err != nil {
 		return nil, err
 	}
-	return pkg, nil
+	if len(pkgs) != 1 {
+		return nil, errors.New("packages.Load found more than one package")
+	}
+	pkg := pkgs[0]
+	switch len(pkg.Errors) {
+	case 0:
+		return pkg, nil
+	case 1:
+		return nil, fmt.Errorf("packages.Load: %v", pkg.Errors[0])
+	default:
+		for _, err := range pkg.Errors {
+			log.Printf("packages.Load: %v", err)
+		}
+		return nil, errors.New("packages.Load failed")
+	}
 }
 
 func auxiliary(dir, imp, pkg string) error {

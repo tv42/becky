@@ -9,6 +9,7 @@ Using `-lib=false` disables creating `asset_*.gen.go` files:
   $ go run github.com/tv42/becky -lib=false greeting.txt
   $ find -type f -printf '%P\n' | sort
   go.mod
+  go.sum
   greeting.txt
   greeting.txt.gen.go
   main.go
@@ -20,6 +21,7 @@ Leaving it out gets them created:
   asset_dev.gen.go
   asset_nodev.gen.go
   go.mod
+  go.sum
   greeting.txt
   greeting.txt.gen.go
   main.go
