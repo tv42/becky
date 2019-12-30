@@ -213,7 +213,7 @@ func loadPkg(dir string) (*packages.Package, error) {
 	}
 	pkgs, err := packages.Load(cfg, "pattern="+dir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot load package: %w", err)
 	}
 	if len(pkgs) != 1 {
 		return nil, errors.New("packages.Load found more than one package")
