@@ -16,10 +16,6 @@ type asset struct {
 	etag    string
 }
 
-func (a asset) init() asset {
-	return a
-}
-
 func (a asset) importPath() string {
 	// filled at code gen time
 	return "{{.ImportPath}}"
