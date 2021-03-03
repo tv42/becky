@@ -2,6 +2,8 @@
 
 Becky embeds assets as string literals in Go source.
 
+**OBSOLETE** Becky has been made unnecessary by the [`embed` package](https://golang.org/pkg/embed) in [Go 1.16](https://blog.golang.org/go1.16). It will not be developed further.
+
 
 ## Usage
 
